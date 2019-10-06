@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+  <title>PizzaForm</title>
+</head>
+
+<body>
+  <header class="display-4 mt-3" style="margin-left: 20%">
+    <span class=" badge badge-pill badge-light">Welcome to PizzaForm.</span>
+  </header>
+  <div id="app" class="container mt-5">
+    <div>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">name</th>
+            <th scope="col">price</th>
+            <th scope="col">quantity</th>
+            <th scope="col" width="140px">sum</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in items" v-bind:key="item.name">
+            <th scope="row">{{ item.name }}</th>
+            <td>{{ item.price }} (pesos)</td>
+            <td><input type="number" v-model="item.quantity" min="0"> </td>
+            <td>{{ item.price * item.quantity | numberWithDelimiter }} (pesos)</td>
+          </tr>
+          <tr>
+            <th scope="row"></th>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr>
+            <th scope="row">subtotal</th>
+            <td>(w/o tax)</td>
+            <td></td>
+            <td> {{ totalPrice | numberWithDelimiter  }} </td>
+          </tr>
+          <tr>
+            <th scope="row">tax</th>
+            <td>(10%)</td>
+            <td></td>
+            <td> {{ totalTax | numberWithDelimiter  }} </td>
+          </tr>
+          <tr>
+            <th scope="row">delivery charge</th>
+            <td>(50 pesos)</td>
+            <td></td>
+            <td> {{ isDelivery }} </td>
+          </tr>
+          <tr>
+            <th scope="row">total</th>
+            <td>(w/ tax)</td>
+            <td></td>
+            <td> {{ totalPriceWithTax | numberWithDelimiter  }} </td>
+          </tr>
+        </tbody>
+      </table>
+      <div style=" margin-left: 70%; display: flex; ">
+        <button v-bind:disabled="!canBuy" v-on:click="doBuy">purchase</button>
+        <button v-on:click="reset">reset</button>
+      </div>
+      <div style=" margin-left: 60%; display: flex; ">
+        <p :style="errorMessageStyle"><strong>* You can buy from 1,000 pesos.</strong></p>
+      </div>
+    </div>
+  </div>
+  <script type="application/javascript">
+    var items = [{
+        name: "pizza",
+        price: 300,
+        quantity: 0
+      },
+      {
+        name: "potato",
+        price: 150,
+        quantity: 0
+      },
+      {
+        name: "coke",
+        price: 100,
+        quantity: 0
+      }
+    ];
+    var app = new Vue({
+      el: "#app",
+      data: {
+        'items': items,
+        'delivery_charge': 50
+      },
+      filters: {
+        numberWithDelimiter: function (value) {
+          if (!value) {
+            return 0;
+          }
+          return value.toString().replace(/(\d)(?=(\d{3})+$)/g, "$1,");
+        }
+      },
+      computed: {
+        totalPrice: function () {
+          return this.items.reduce(function (sum, item) {
+            return sum + (item.price * item.quantity)
+          }, 0);
+        },
+        totalPriceWithTax: function () {
+          return Math.floor(this.totalPrice * 1.1) + this.isDelivery;
+        },
+        totalTax: function () {
+          return Math.floor(this.totalPrice * 0.1);
+        },
+        isDelivery: function () {
+          return this.totalPrice > 0 ? 50 : 0;
+        },
+        canBuy: function () {
+          return this.totalPrice >= 1000;
+        },
+        errorMessageStyle: function () {
+          return {
+            border: this.canBuy ? "" : "1px solid red",
+            color: this.canBuy ? "" : "red",
+            display: this.canBuy ? "none" : "inline",
+          };
+        }
+      },
+      methods: {
+        doBuy: function () {
+          alert("Thank you serve.");
+          this.items.forEach(function (item) {
+            item.quantity = 0;
+          });
+        },
+        reset: function () {
+          alert("You have reset.");
+          this.items.forEach(function (item) {
+            item.quantity = 0;
+          });
+        }
+      }
+    });
+  </script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous">
+  </script>
+</body>
+
+</html>
